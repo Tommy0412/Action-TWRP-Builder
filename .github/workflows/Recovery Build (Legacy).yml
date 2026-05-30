@@ -142,20 +142,16 @@ jobs:
         sudo ln -sf /usr/bin/python2 /usr/bin/python
       continue-on-error: true
 
-- name: Building recovery
+    - name: Building recovery
       run: |
         sudo ln -sf /usr/bin/python2 /usr/bin/python
-        
         source build/envsetup.sh
-        
         export ALLOW_MISSING_DEPENDENCIES=true
         export BUILD_BROKEN_DUP_RULES=true
         export BUILD_BROKEN_USES_NETWORK=true
         export BUILD_BROKEN_NINJA_USES_ENV_VARS=true
-        
         export USE_CCACHE=1
         export CCACHE_EXEC=/usr/bin/ccache
-        
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
