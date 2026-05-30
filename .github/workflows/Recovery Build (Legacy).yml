@@ -98,23 +98,37 @@ jobs:
         chmod a+x ~/bin/repo
         sudo ln -sf ~/bin/repo /usr/bin/repo
 
+    # --- KORAK ZA CACHE (Smanjuje repo sync s 15 minuta na 1-2 minute) ---
+    - name: Cache Android Source
+      id: cache-repo
+      uses: actions/cache@v4
+      with:
+        path: workspace/.repo
+        key: repo-${{ github.event.inputs.MANIFEST_BRANCH }}-${{ hashFiles('.github/workflows/*.yml') }}
+        restore-keys: |
+          repo-${{ github.event.inputs.MANIFEST_BRANCH }}-
+
     - name: Initialize repo
       run: |
-        mkdir workspace
+        mkdir -p workspace
         cd workspace
         echo "workspace-folder=$(pwd)" >> $GITHUB_OUTPUT
         git config --global user.name "azwhikaru"
         git config --global user.email "azwhikaru+37921907@github.com"
-        repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        # Inicijaliziramo samo ako .repo mapa već ne postoji iz cachea
+        if [ ! -d ".repo" ]; then
+          repo init --depth=1 -u ${{ github.event.inputs.MANIFEST_URL }} -b ${{ github.event.inputs.MANIFEST_BRANCH }}
+        fi
       id: pwd
 
     - name: Repo Sync
       run: |
-        repo sync -j$(nproc --all) --force-sync
+        repo sync -j$(nproc --all) --force-sync --no-tags --no-clone-bundle
       working-directory: workspace
 
     - name: Clone device tree
       run: |
+        rm -rf ./${{ github.event.inputs.DEVICE_PATH }}
         git clone ${{ github.event.inputs.DEVICE_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.DEVICE_PATH }}
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
@@ -122,6 +136,7 @@ jobs:
       if: |
         github.event.inputs.COMMON_TREE_URL != null && github.event.inputs.COMMON_PATH != null
       run: |
+        rm -rf ./${{ github.event.inputs.COMMON_PATH }}
         git clone ${{ github.event.inputs.COMMON_TREE_URL }} -b ${{ github.event.inputs.DEVICE_TREE_BRANCH }} ./${{ github.event.inputs.COMMON_PATH }}
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
@@ -144,6 +159,8 @@ jobs:
       run: |
         source build/envsetup.sh
         export ALLOW_MISSING_DEPENDENCIES=true
+        export USE_CCACHE=1
+        export CCACHE_EXEC=/usr/bin/ccache
         lunch ${{ github.event.inputs.MAKEFILE_NAME }}-eng && make clean && make ${{ github.event.inputs.BUILD_TARGET }}image -j$(nproc --all)
       working-directory: ${{ steps.pwd.outputs.workspace-folder }}
 
