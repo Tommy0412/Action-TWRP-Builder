@@ -1,4 +1,4 @@
-name: Recovery Build (Legacy)
+name: Recovery Build (Legacy - TWRP 7.1)
 
 on:
   workflow_dispatch:
@@ -10,7 +10,7 @@ on:
       MANIFEST_BRANCH:
         description: 'MANIFEST_BRANCH'
         required: true
-        default: 'twrp-8.1'
+        default: 'twrp-7.1'
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
@@ -80,7 +80,7 @@ jobs:
             x11proto-core-dev libx11-dev tree lib32z1-dev libgl1-mesa-dev libxml2-utils \
             xsltproc bc ccache libreadline-dev liblz4-tool libsdl1.2-dev \
             libxml2 lzop pngcrush schedtool squashfs-tools \
-            imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++6 tar
+            imagemagick libbz2-dev lzma ncftp qemu-user-static libstdc++6 tar python2-minimal
         EOF
         bash setup_env.sh
 
@@ -143,11 +143,9 @@ jobs:
 
     - name: Switch to Python2
       run: |
-        sudo apt update
-        sudo apt install -y software-properties-common
-        sudo add-apt-repository ppa:deadsnakes/ppa -y
-        sudo apt update
-        sudo apt install -y python2-minimal
+        # Za stariji TWRP 7.1 moramo osigurati ispravan Python 2 link
+        sudo curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
+        sudo python2 get-pip.py
         sudo ln -sf /usr/bin/python2 /usr/bin/python
       continue-on-error: true
 
