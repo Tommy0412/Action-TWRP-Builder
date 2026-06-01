@@ -6,7 +6,7 @@ on:
       MANIFEST_URL:
         description: 'MANIFEST_URL'
         required: true
-        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_omni'
+        default: 'https://github.com/minimal-manifest-twrp/platform_manifest_twrp_aosp'
       MANIFEST_BRANCH:
         description: 'MANIFEST_BRANCH'
         required: true
@@ -153,6 +153,12 @@ jobs:
       run: |
         sudo ln -sf /usr/bin/python2 /usr/bin/python
         source build/envsetup.sh
+        export ALLOW_MISSING_DEPENDENCIES=true
+        export BUILD_BROKEN_DUP_RULES=true
+        export BUILD_BROKEN_USES_NETWORK=true
+        export BUILD_BROKEN_NINJA_USES_ENV_VARS=true
+        export BUILD_BROKEN_ANDROIDMK_EXPORTS=true
+        export BUILD_BROKEN_DUP_COPY_HEADERS=true
         export ALLOW_MISSING_DEPENDENCIES=true
         export BUILD_BROKEN_DUP_RULES=true
         export BUILD_BROKEN_USES_NETWORK=true
