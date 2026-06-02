@@ -1,4 +1,4 @@
-name: Recovery Build (Legacy - TWRP 7.1)
+name: Recovery Build (Legacy)
 
 on:
   workflow_dispatch:
@@ -69,12 +69,10 @@ jobs:
       run: |
         cat << 'EOF' > setup_env.sh
         sudo apt update
-        # --- RUČNO PREUZIMANJE I INSTALACIJA LIBNCURSES5 ---
         wget http://mirrors.kernel.org/ubuntu/pool/universe/n/ncurses/libtinfo5_6.2-0ubuntu2_amd64.deb
         wget http://mirrors.kernel.org/ubuntu/pool/universe/n/ncurses/libncurses5_6.2-0ubuntu2_amd64.deb
         sudo apt install -y ./libtinfo5_6.2-0ubuntu2_amd64.deb ./libncurses5_6.2-0ubuntu2_amd64.deb
         
-        # Instalacija ostalih potrebnih paketa
         DEBIAN_FRONTEND=noninteractive sudo apt install -yq \
             gperf gcc-multilib g++-multilib libc6-dev lib32ncurses-dev \
             x11proto-core-dev libx11-dev tree lib32z1-dev libgl1-mesa-dev libxml2-utils \
@@ -143,7 +141,6 @@ jobs:
 
     - name: Switch to Python2
       run: |
-        # Za stariji TWRP 7.1 moramo osigurati ispravan Python 2 link
         sudo curl https://bootstrap.pypa.io/pip/2.7/get-pip.py --output get-pip.py
         sudo python2 get-pip.py
         sudo ln -sf /usr/bin/python2 /usr/bin/python
