@@ -14,7 +14,7 @@ on:
       DEVICE_TREE_URL:
         description: 'DEVICE_TREE_URL'
         required: true
-        default: 'https://github.com/Tommy0412/denver_taq_90083_device_tree'
+        default: 'https://github.com/Tommy0412/denver_taq_90083_device_tree_twrp'
       DEVICE_TREE_BRANCH:
         description: 'DEVICE_TREE_BRANCH'
         required: true
